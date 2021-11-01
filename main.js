@@ -7,6 +7,11 @@ speak_data = "";
 to_number = "";
 draw_apple = "";
 
+function preload()
+{
+  apple = loadImage('apple.png');
+}
+
 var SpeechRecognition = window.webkitSpeechRecognition;
   
 var recognition = new SpeechRecognition();
@@ -15,26 +20,49 @@ function start()
 {
   document.getElementById("status").innerHTML = "System is listening please speak";  
   recognition.start();
-} 
- 
+}
+
 recognition.onresult = function(event) {
 
- console.log(event);
- to_number = Number() 
-
- if(Number.isInteger(to_number))
- {
-   draw_apple = "set";
- } 
- else
- {
-   speak_data = "The speech has not recognized a number";
+  console.log(event);
+  content = event.results[0][0].transcript;
+  document.getElementById("status").innerHTML = "The speech has been recognized: " + content; 
+  to_number = Number(content);
+ 
+  if(Number.isInteger(to_number))
+  {
+    document.getElementById("status").innerHTML = "Started drawing apple"; 
+    draw_apple = "set";
+  } 
+  else
+  {
+    document.getElementById("status").innerHTML = "The speach has not been recongnised";
+  } 
  }
 
- content = event.results[0][0].transcript;
+function setup() 
+{
+ screen_width = window.innerWidth;
+ screen_height = window.innerHeight;
 
-    document.getElementById("status").innerHTML = "The speech has been recognized: " + content; 
+ canvas = createCanvas(screen_width, screen_height - 150);
+ canvas.position(0, 150);
+}
 
+function draw() {
+  if(draw_apple == "set")
+  {
+    for(var i = 1; i <= to_number; i++)
+    {
+      x = Math.floor(Math.random() * 700);
+      y = Math.floor(Math.random() * 400);
+      image(apple, x, y, 50, 50);
+    }
+    document.getElementById("status").innerHTML = to_number + " Apples drawn";
+    speak_data = "The speech has not recognized a number";
+    speak();
+    draw_apple = "";
+  }
 }
 
 function setup() 
@@ -59,9 +87,4 @@ function speak(){
     synth.speak(utterThis);
 
     speak_data = "";
-}
-
-function preload()
-{
-  apple = loadImage('https://i.postimg.cc/k5knk5ZF/apple.png');
 }
